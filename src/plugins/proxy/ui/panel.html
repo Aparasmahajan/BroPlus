@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proxy</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="panel proxy-root">
+    <div class="px-bar">
+      <button id="toggle" class="send">Start proxy</button>
+      <span id="pstatus" class="time">stopped</span>
+      <label class="chk"><input type="checkbox" id="intercept" /> Intercept</label>
+      <input id="scope" class="scope" spellcheck="false" placeholder="scope hosts (comma) — empty = all" />
+      <span class="grow"></span>
+      <button id="ca" class="mini-btn" title="Show CA certificate (PEM)">CA cert</button>
+      <button id="clear" class="mini-btn">Clear</button>
+      <button id="v-history" class="mini-btn active">History</button>
+      <button id="v-repeater" class="mini-btn">Repeater</button>
+    </div>
+
+    <div id="intercept-bar" class="px-intercept" hidden>
+      <div class="ib-head">
+        <span id="ib-method" class="m"></span>
+        <input id="ib-url" class="url" spellcheck="false" />
+        <button id="ib-forward" class="send">Forward</button>
+        <button id="ib-drop" class="mini-btn">Drop</button>
+      </div>
+      <textarea id="ib-headers" class="mono-ta" spellcheck="false" placeholder="Header: value (one per line)"></textarea>
+      <textarea id="ib-body" class="mono-ta" spellcheck="false" placeholder="request body"></textarea>
+    </div>
+
+    <div id="view-history" class="px-view">
+      <div id="hist" class="px-list"></div>
+      <div id="detail" class="px-detail"><div class="tree-empty">Select a request from the history.</div></div>
+    </div>
+
+    <div id="view-repeater" class="px-view" hidden>
+      <div class="rep-edit">
+        <div class="api-bar">
+          <select id="rep-method" class="method">
+            <option>GET</option><option>POST</option><option>PUT</option>
+            <option>PATCH</option><option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+          </select>
+          <input id="rep-url" class="url" spellcheck="false" placeholder="https://…" />
+          <button id="rep-send" class="send">Send</button>
+        </div>
+        <label class="mini">Headers (one per line — Name: value)</label>
+        <textarea id="rep-headers" class="mono-ta" spellcheck="false"></textarea>
+        <label class="mini">Body</label>
+        <textarea id="rep-body" class="mono-ta" spellcheck="false"></textarea>
+      </div>
+      <pre id="rep-out" class="out"></pre>
+    </div>
+
+    <script src="proxy.js"></script>
+  </body>
+</html>

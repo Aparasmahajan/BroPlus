@@ -1,0 +1,16 @@
+{
+  "_comment": "Build-time plugin selection. The browser shell is CORE and always present. Remove an id from `enabled` (or set the BRO_PLUGINS env var to a comma-separated list, which overrides this file) to EXCLUDE that feature from the build — its code is then not imported and gets tree-shaken out. `dependsOn` is enforced by esbuild.mjs: enabling a plugin without its dependencies fails the build. See PLUGINS.md for the full catalog.",
+  "enabled": [
+    "overlay-hiding",
+    "opacity",
+    "api-client",
+    "proxy",
+    "diff",
+    "adblock"
+  ],
+  "examples": {
+    "browser-only": ["overlay-hiding", "opacity"],
+    "api-workbench": ["overlay-hiding", "opacity", "api-client", "diff"],
+    "security-suite": ["overlay-hiding", "opacity", "api-client", "proxy", "diff"]
+  }
+}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API client</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="panel api-root">
+    <!-- Sidebar: environments + save + collections / history tree -->
+    <aside class="api-side">
+      <div class="side-row">
+        <select id="env" class="grow" title="Active environment"></select>
+        <button id="env-new" class="mini-btn" title="New environment">+</button>
+        <button id="env-edit" class="mini-btn" title="Edit environment">✎</button>
+      </div>
+      <div class="side-row">
+        <input id="req-name" class="grow" placeholder="request name" spellcheck="false" />
+        <select id="save-col" title="Save into collection"></select>
+        <button id="req-save" class="mini-btn" title="Save request">Save</button>
+      </div>
+      <div class="side-row">
+        <button id="col-new" class="mini-btn grow">+ Collection</button>
+        <button id="view-collections" class="mini-btn active">Tree</button>
+        <button id="view-history" class="mini-btn">History</button>
+      </div>
+      <div id="tree" class="tree"></div>
+    </aside>
+
+    <!-- Main request/response area -->
+    <main class="api-main">
+      <div class="api-bar">
+        <select id="method" class="method">
+          <option>GET</option><option>POST</option><option>PUT</option>
+          <option>PATCH</option><option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+        </select>
+        <input id="url" class="url" type="text" spellcheck="false" autocomplete="off"
+               placeholder="https://api.example.com/path   —   {{baseUrl}}/path works" />
+        <button id="send" class="send">Send</button>
+      </div>
+
+      <nav class="rtabs">
+        <button class="rtab active" data-rt="params">Params</button>
+        <button class="rtab" data-rt="headers">Headers</button>
+        <button class="rtab" data-rt="auth">Auth</button>
+        <button class="rtab" data-rt="body">Body</button>
+      </nav>
+
+      <section class="rtab-body">
+        <div class="kv-wrap" data-rtp="params"></div>
+        <div class="kv-wrap" data-rtp="headers" hidden></div>
+        <div class="auth-wrap" data-rtp="auth" hidden>
+          <label class="mini">Authorization</label>
+          <select id="auth-kind">
+            <option value="none">No Auth</option>
+            <option value="bearer">Bearer Token</option>
+            <option value="basic">Basic Auth</option>
+          </select>
+          <div id="auth-fields"></div>
+        </div>
+        <div class="body-wrap" data-rtp="body" hidden>
+          <div class="body-modes">
+            <label><input type="radio" name="bm" value="none" /> None</label>
+            <label><input type="radio" name="bm" value="json" /> JSON</label>
+            <label><input type="radio" name="bm" value="text" /> Raw</label>
+            <label><input type="radio" name="bm" value="form" /> Form</label>
+          </div>
+          <textarea id="body" spellcheck="false" placeholder='{ "key": "{{value}}" }'></textarea>
+          <div class="kv-wrap" id="form-rows" hidden></div>
+        </div>
+      </section>
+
+      <section class="res">
+        <div class="res-head">
+          <span id="status" class="status">—</span>
+          <span id="time" class="time"></span>
+          <span id="size" class="time"></span>
+          <span class="grow"></span>
+          <button id="t-body" class="seg active">Body</button>
+          <button id="t-headers" class="seg">Headers</button>
+          <button id="t-diff" class="seg">Diff</button>
+        </div>
+        <pre id="out" class="out"></pre>
+      </section>
+    </main>
+
+    <script src="api-client.js"></script>
+  </body>
+</html>

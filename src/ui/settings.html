@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="settings">
+    <div class="settings-sheet">
+      <header class="settings-head">
+        <h1>Settings</h1>
+        <button id="close" class="icon-btn" title="Close (Esc)" aria-label="Close">&#x2715;</button>
+      </header>
+
+      <section class="group" id="sec-overlay" hidden>
+        <h2>Privacy</h2>
+
+        <div class="row">
+          <div class="row-label">
+            <strong>Hidden from screen share</strong>
+            <small id="capture-detail"></small>
+          </div>
+          <button id="capture-pill" class="pill" role="switch" aria-checked="true">
+            <span class="dot"></span><span id="capture-text">ON</span>
+          </button>
+        </div>
+
+        <p class="note">
+          Hides this window from <em>software</em> screen capture (Teams, Meet, Zoom, OBS,
+          screen recorders). It does <strong>not</strong> hide from a phone camera or an
+          HDMI capture card. Only record or share meetings where you have consent.
+        </p>
+      </section>
+
+      <section class="group" id="sec-opacity" hidden>
+        <h2>Appearance</h2>
+        <div class="row">
+          <div class="row-label">
+            <strong>Window opacity</strong>
+            <small>Fade the whole window. Floor is 20% so you can't lose it.</small>
+          </div>
+          <div class="opacity-ctl">
+            <input id="opacity" type="range" min="0.2" max="1" step="0.05" value="1" />
+            <span id="opacity-val" class="mono">100%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="group">
+        <h2>Shortcuts</h2>
+        <ul class="hotkeys">
+          <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> — toggle screen-share invisibility</li>
+          <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> — open / close Settings</li>
+          <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>]</kbd> / <kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>[</kbd> — opacity up / down</li>
+          <li><kbd class="mod">Ctrl</kbd>+<kbd>T</kbd> new tab · <kbd class="mod">Ctrl</kbd>+<kbd>W</kbd> close · <kbd class="mod">Ctrl</kbd>+<kbd>L</kbd> address bar · <kbd class="mod">Ctrl</kbd>+<kbd>R</kbd> reload</li>
+        </ul>
+      </section>
+    </div>
+
+    <script src="settings.js"></script>
+  </body>
+</html>

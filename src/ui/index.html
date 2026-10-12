@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bro</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="chrome">
+    <!-- Row 1: tab strip (draggable) -->
+    <div id="tabstrip">
+      <div id="tabs"></div>
+      <button id="new-tab" class="icon-btn" title="New tab (Ctrl/Cmd+T)" aria-label="New tab">+</button>
+      <div class="drag-fill"></div>
+      <div id="win-controls" class="win-controls">
+        <button class="win-btn" id="btn-min" title="Minimize" aria-label="Minimize">&#x2013;</button>
+        <button class="win-btn" id="btn-max" title="Maximize" aria-label="Maximize">&#x25A1;</button>
+        <button class="win-btn danger" id="btn-close" title="Close" aria-label="Close">&#x2715;</button>
+      </div>
+    </div>
+
+    <!-- Row 2: toolbar -->
+    <div id="toolbar">
+      <button class="icon-btn" id="btn-back" title="Back" aria-label="Back">&#x2190;</button>
+      <button class="icon-btn" id="btn-forward" title="Forward" aria-label="Forward">&#x2192;</button>
+      <button class="icon-btn" id="btn-reload" title="Reload (Ctrl/Cmd+R)" aria-label="Reload">&#x21bb;</button>
+      <div id="mode-switch" class="mode-switch"></div>
+      <div id="omnibox-wrap">
+        <input
+          id="omnibox"
+          type="text"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="Search Google or type a URL"
+        />
+      </div>
+      <button class="icon-btn" id="btn-settings" title="Settings (Ctrl/Cmd+Shift+S)" aria-label="Settings">&#x2699;</button>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>

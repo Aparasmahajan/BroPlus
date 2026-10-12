@@ -1,0 +1,27 @@
+{
+  "name": "bro-plus",
+  "version": "0.0.1",
+  "description": "Bro_plus — one screen-share-invisible Chromium browser that fuses Browse + a Postman-class API client + a Burp-class intercepting proxy, as build-selectable plugins.",
+  "main": "dist/main/index.js",
+  "author": "Mahajan",
+  "license": "MIT",
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "start": "npm run build && electron .",
+    "dev": "npm run build && electron . --enable-logging",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "electron": "^32.2.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "mockttp": "^3.17.2",
+    "undici": "^6.29.0"
+  },
+  "comment:future-deps": "Added in their ROADMAP phase (all install without a C compiler EXCEPT better-sqlite3, which needs node-gyp/MSVC — use the JSONL history fallback if unavailable): mockttp (proxy MITM), @iarna/toml (collections), @ghostery/adblocker-electron (adblock), better-sqlite3 (proxy history)."
+}

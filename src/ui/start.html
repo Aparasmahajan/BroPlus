@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Tab</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="start">
+    <main class="start-wrap">
+      <div class="logo">Bro</div>
+      <p class="tagline">Private browsing. Hidden from screen share.</p>
+
+      <form id="search-form" class="start-search" autocomplete="off">
+        <input
+          id="q"
+          type="text"
+          spellcheck="false"
+          placeholder="Search Google or type a URL"
+          autofocus
+        />
+      </form>
+
+      <div class="shortcuts-grid">
+        <a class="shortcut" href="https://www.google.com">Google</a>
+        <a class="shortcut" href="https://www.youtube.com">YouTube</a>
+        <a class="shortcut" href="https://github.com">GitHub</a>
+        <a class="shortcut" href="https://en.wikipedia.org">Wikipedia</a>
+      </div>
+
+      <p class="hint">
+        Press <kbd id="k">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> for Settings ·
+        <kbd id="k2">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> to toggle screen-share invisibility
+      </p>
+    </main>
+
+    <script>
+      // Self-navigating: no privileged bridge on web content. We just set
+      // location, and the main process picks up did-navigate to update the bar.
+      (function () {
+        var mac = navigator.platform.toLowerCase().indexOf('mac') === 0;
+        if (mac) { document.getElementById('k').textContent = 'Cmd'; document.getElementById('k2').textContent = 'Cmd'; }
+
+        function resolve(raw) {
+          var input = (raw || '').trim();
+          if (!input) return null;
+          if (/^(https?|file|about):/i.test(input)) return input;
+          var looksLikeUrl = /^[^\s]+\.[^\s]+$/.test(input) || /^localhost(:\d+)?/.test(input);
+          if (looksLikeUrl) return 'https://' + input;
+          return 'https://www.google.com/search?q=' + encodeURIComponent(input);
+        }
+
+        document.getElementById('search-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          var url = resolve(document.getElementById('q').value);
+          if (url) window.location.href = url;
+        });
+      })();
+    </script>
+  </body>
+</html>
