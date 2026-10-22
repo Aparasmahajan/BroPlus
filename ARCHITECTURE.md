@@ -190,10 +190,22 @@ what a Burp user needs to see faithfully. Never normalize into an object.
 
 ## 4. Surface 1 — Browse (inherited from Bro)
 
-Unchanged. `tabs.ts` already gives isolated WebContentsView tabs, omnibox
-navigation, back/forward/reload, favicons, titles, and `window.open` → new tab.
-The only addition: tabs load through the **shared session** that the proxy and
-API engines also use, so a logged-in session is visible to all three.
+> **Status: ported in full from Bro** (2026-10-14) — see README → Features.
+
+Bro's whole browser is core: `tabs.ts` (isolated WebContentsView tabs, private
+tabs on an in-memory session, sleeping restored tabs, Library tabs `bro://…`),
+`profiles.ts` (one persistent session per profile), `library.ts`/`sessions.ts`,
+`downloads.ts` + `torrents.ts`, `offline.ts` + `video-tools.ts` +
+`stream-grabber.ts`, `extensions.ts`, `context-menu.ts`, `shortcuts.ts` +
+`commands.ts` (rebindable registry in `shared/shortcuts.ts`). The default
+profile's tabs use the **shared session** the proxy and API engines also use, so a
+logged-in session is visible to all three.
+
+Plugin seams added for the port: `MainContext.onSession` (adblock attaches to
+every browsing session), `onWindow`, `onStarted`; registry commands tagged
+`plugin` (capture/opacity keys exist only with their plugin); plugin preloads
+(`src/plugins/<id>/preload.ts`). Tab activation or toolbar navigation returns to
+the Browse surface.
 
 Carried-over signature features (window.ts): `setContentProtection(true)` default
 ON, opacity floor `0.2`, hotkeys. The mode switch lives in the existing chrome
@@ -203,10 +215,17 @@ view, so switching to API/Proxy is instant and stays within the protected window
 
 ## 5. Surface 2 — API client (Postman-class)
 
-> **Status: implemented.** Code lives in the `api-client` plugin
-> (`src/plugins/api-client/`): `engine.ts` (undici sender), `store.ts` (TOML
-> collections/environments + JSON history), `main.ts` (IPC), `ui/panel.{html,ts}`
-> (builder + response viewer + diff). The paths below that say `src/main/*` are the
+> **Status: implemented (Postman-class, 2026-10-15).** Code lives in the
+> `api-client` plugin (`src/plugins/api-client/`): `engine.ts` (undici sender:
+> redirects hop by hop, TLS toggle, timeout, the BROWSER cookie jar, optional
+> upstream = the Proxy plugin via `ctx.lookup('proxy')`), `resolve.ts` (draft →
+> vars → auth inheritance → body encoding → `${vault:}`/`${env:}` expansion),
+> `sandbox.ts` (pre-request/test scripts, `pm.*`, in QuickJS-wasm with a 3 s /
+> 64 MB cap — not Node `vm`), `runner.ts` (send pipeline + collection runner +
+> OAuth 2 token), `vault.ts` (safeStorage), `interop.ts` (Postman/OpenAPI/cURL
+> import, Postman export, CSV/JSON data files), `store.ts` (TOML collections,
+> environments, globals, hot-reload watcher, JSON history), `main.ts` (IPC),
+> `ui/panel.{html,ts,css}`. Expanded secrets are never written to history. The paths below that say `src/main/*` are the
 > original monolith sketch; the plugin refactor (§A) is the shipped layout.
 
 ### 5.1 Engine — `src/main/http.ts` (`HttpEngine`)

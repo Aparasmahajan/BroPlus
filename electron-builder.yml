@@ -1,0 +1,85 @@
+# electron-builder configuration for Bro Plus.
+#   npm run dist        # current OS
+#   npm run dist:win    # Windows NSIS installer + portable .exe
+#   npm run dist:mac    # macOS .dmg + .zip  (must run on a Mac)
+#
+# NOTE: packaging downloads toolchain binaries (app-builder, winCodeSign, nsis,
+# notarytool) from GitHub on first run. On a network that blocks those, run the
+# build on a machine that can reach them, or pre-seed electron-builder's cache.
+appId: com.mahajan.broplus
+productName: Bro Plus
+copyright: Copyright © 2026 Mahajan
+
+directories:
+  output: release
+  buildResources: build
+
+# Our code is bundled into dist/ by esbuild; production deps in node_modules are
+# included automatically by electron-builder.
+files:
+  - dist/**/*
+  - package.json
+
+# Electron is castlabs' build with Widevine (Netflix & other DRM video). Package the binary that
+# npm installed instead of downloading upstream Electron, then VMP-sign it for production.
+electronDist: node_modules/electron/dist
+afterPack: build/after-pack.cjs
+# The native modules (WebTorrent's utp-native, ws's bufferutil/utf-8-validate) ship prebuilt
+# Node-API binaries that load in Electron as they are; rebuilding needs Visual Studio.
+npmRebuild: false
+
+asar: true
+# These packages resolve their own preload/module paths at runtime via
+# require.resolve()/createRequire(), so they must stay UNPACKED from the asar.
+asarUnpack:
+  - node_modules/@ghostery/**
+  - node_modules/electron-chrome-extensions/**
+  - node_modules/electron-chrome-web-store/**
+  - node_modules/electron-chrome-context-menu/**
+
+# ---- Windows -------------------------------------------------------------
+win:
+  # icon: build/icon.ico   # add a 256px .ico here, then uncomment
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+portable:
+  artifactName: ${productName}-${version}-portable.exe
+
+# ---- macOS ---------------------------------------------------------------
+mac:
+  # icon: build/icon.icns  # add a 512px .icns here, then uncomment
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+    - target: zip      # required for electron-updater on macOS
+      arch: [arm64, x64]
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # Notarization: set APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID in the
+  # environment and set notarize.teamId, or flip to `notarize: true` with
+  # APPLE_TEAM_ID set. Requires an Apple Developer account.
+  notarize: false
+
+dmg:
+  artifactName: ${productName}-${version}-${arch}.dmg
+
+# ---- Auto-update ---------------------------------------------------------
+# electron-updater reads this. Replace with your real release host before
+# shipping (GitHub Releases, S3, or any generic HTTPS server).
+publish:
+  provider: generic
+  url: https://example.com/bro-plus/updates/

@@ -29,6 +29,8 @@ export interface HttpResponse {
   /** Raw bytes, base64. Decoded for display; never eval'd. */
   body: { b64: string; truncatedBytes?: number };
   timingMs: number;
+  /** Time to the response headers of the final hop (API client). */
+  ttfbMs?: number;
   fromCache?: boolean;
 }
 

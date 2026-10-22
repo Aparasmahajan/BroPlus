@@ -1,0 +1,6 @@
+{
+  "manifest_version": 3,
+  "name": "Bro e2e hello",
+  "version": "1.0",
+  "description": "Do-nothing extension the profiles suite loads into the default profile."
+}

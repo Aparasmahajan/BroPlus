@@ -4,3 +4,4 @@ release/
 *.log
 .DS_Store
 .env
+tests/e2e/.builds/

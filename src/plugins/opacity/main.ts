@@ -6,11 +6,10 @@
 //   opacity:get     invoke → number (0.2..1)
 //   opacity:set     send(number)
 //   opacity:nudge   send(number delta)
-//   opacity:changed event → number
-// Hotkeys: Ctrl/Cmd+Shift+] more opaque, Ctrl/Cmd+Shift+[ more transparent.
+//   opacity:changed event → number (emitted by the window on every change)
+// Hotkeys: the rebindable `stealth.opacityUp/Down/Reset` commands (defaults
+// Ctrl/Cmd+Shift+] / [ / \) — they exist only in builds with this plugin.
 import type { BroPlugin, MainContext } from '../../core/plugin';
-
-const STEP = 0.05;
 
 const plugin: BroPlugin = {
   manifest: {
@@ -20,25 +19,12 @@ const plugin: BroPlugin = {
   },
 
   registerMain(ctx: MainContext): void {
-    const broadcast = () => ctx.sendToUi('opacity:changed', ctx.getOpacity());
-
     ctx.ipc.handle('opacity:get', () => ctx.getOpacity());
     ctx.ipc.on('opacity:set', (_e, v: number) => {
-      ctx.setOpacity(v);
-      broadcast();
+      if (Number.isFinite(v)) ctx.setOpacity(v);
     });
     ctx.ipc.on('opacity:nudge', (_e, d: number) => {
-      ctx.nudgeOpacity(d);
-      broadcast();
-    });
-
-    ctx.registerHotkey('CommandOrControl+Shift+]', () => {
-      ctx.nudgeOpacity(STEP);
-      broadcast();
-    });
-    ctx.registerHotkey('CommandOrControl+Shift+[', () => {
-      ctx.nudgeOpacity(-STEP);
-      broadcast();
+      if (Number.isFinite(d)) ctx.nudgeOpacity(d);
     });
   },
 };

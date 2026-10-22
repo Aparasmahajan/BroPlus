@@ -2,6 +2,7 @@
 // 'proxy' mode + panel and wires the mockttp engine's IPC. Depends on `diff`.
 import type { BroPlugin, MainContext } from '../../core/plugin';
 import type { HttpRequest } from '../../shared/http-model';
+import type { ProxyService } from '../../shared/services';
 import { ProxyEngine } from './engine';
 
 const plugin: BroPlugin = {
@@ -18,6 +19,16 @@ const plugin: BroPlugin = {
     const engine = new ProxyEngine(ctx.session, ctx.configDir);
     engine.onExchange = (ex) => ctx.sendToUi('proxy:exchange', ex);
     engine.onPaused = (p) => ctx.sendToUi('proxy:paused', p);
+    // Other plugins (the API client's "send through proxy") find the live proxy here.
+    ctx.provide<ProxyService>('proxy', {
+      get running() {
+        return engine.running;
+      },
+      get port() {
+        return engine.port;
+      },
+      caPem: () => engine.caCertPem(),
+    });
 
     ctx.ipc.handle('proxy:status', () => ({
       running: engine.running,

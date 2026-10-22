@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Library</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="pages.css" />
+  </head>
+  <body class="page">
+    <svg class="sprite" aria-hidden="true">
+      <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+      <symbol id="i-tabs" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 3v6"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
+      <symbol id="i-offline" viewBox="0 0 24 24"><path d="M12 13V7"/><path d="m15 10-3 3-3-3"/><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M12 17v4"/><path d="M8 21h8"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+      <symbol id="i-magnet" viewBox="0 0 24 24"><path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15"/><path d="m5 8 4 4"/><path d="m12 15 4 4"/></symbol>
+    </svg>
+
+    <header class="page-head">
+      <div class="page-title"><svg class="ico brand"><use id="title-icon" href="#i-download" /></svg><span id="page-title">Library</span></div>
+      <label class="page-search">
+        <svg class="ico"><use href="#i-search" /></svg>
+        <input id="filter" type="search" placeholder="Search" spellcheck="false" autocomplete="off" />
+      </label>
+      <div class="head-actions">
+        <button id="clear-history" class="text-btn" hidden>Clear browsing history</button>
+        <button id="clear-offline" class="text-btn" hidden title="Remove finished entries from this list (the saved files stay)">Clear list</button>
+        <button id="close" class="icon-btn" title="Close (Esc)" aria-label="Close"><svg class="ico"><use href="#i-x" /></svg></button>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <nav class="side-nav">
+        <button id="tab-bookmarks" class="lib-tab"><svg class="ico"><use href="#i-star" /></svg>Bookmarks</button>
+        <button id="tab-history" class="lib-tab"><svg class="ico"><use href="#i-clock" /></svg>History</button>
+        <button id="tab-sessions" class="lib-tab"><svg class="ico"><use href="#i-tabs" /></svg>Sessions</button>
+        <button id="tab-downloads" class="lib-tab"><svg class="ico"><use href="#i-download" /></svg>Downloads<span id="nav-dl-count" class="nav-count" hidden></span></button>
+        <button id="tab-offline" class="lib-tab"><svg class="ico"><use href="#i-offline" /></svg>Offline videos</button>
+      </nav>
+
+      <main class="page-main">
+        <div class="page-column">
+          <div id="dl-panel" class="dl-panel" hidden>
+            <form id="dl-add" class="dl-add" autocomplete="off">
+              <svg class="ico"><use href="#i-download" /></svg>
+              <input id="dl-add-url" type="text" spellcheck="false" placeholder="Paste a link or a magnet link to download" aria-label="Link to download" />
+              <button type="submit" class="text-btn accent">Download</button>
+            </form>
+            <p class="form-msg" id="dl-add-msg"></p>
+            <div class="dl-summary">
+              <span id="dl-summary-text"></span>
+              <div class="dl-summary-actions">
+                <button id="dl-pause-all" class="link-btn"><svg class="ico"><use href="#i-pause" /></svg>Pause all</button>
+                <button id="dl-resume-all" class="link-btn"><svg class="ico"><use href="#i-play" /></svg>Resume all</button>
+                <button id="dl-open-folder" class="link-btn"><svg class="ico"><use href="#i-folder" /></svg>Open folder</button>
+                <button id="clear-downloads" class="link-btn">Clear finished</button>
+              </div>
+            </div>
+          </div>
+
+          <form id="save-session" class="lib-save" autocomplete="off" hidden>
+            <input id="session-name" class="field grow" type="text" spellcheck="false" placeholder="Name for the tabs open now…" aria-label="Session name" />
+            <button type="submit" class="text-btn accent">Save open tabs</button>
+          </form>
+
+          <div id="list" class="lib-list"></div>
+          <div id="empty" class="empty-state" hidden>
+            <svg class="ico big"><use id="empty-icon" href="#i-download" /></svg>
+            <p id="empty-text">Nothing here yet.</p>
+          </div>
+          <p id="profile-note" class="lib-profile-note" hidden></p>
+        </div>
+      </main>
+    </div>
+
+    <script src="library.js"></script>
+  </body>
+</html>

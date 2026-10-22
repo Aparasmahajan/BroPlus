@@ -10,18 +10,35 @@
     "watch": "node esbuild.mjs --watch",
     "start": "npm run build && electron .",
     "dev": "npm run build && electron . --enable-logging",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "vmp": "node scripts/evs.mjs",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac"
   },
   "devDependencies": {
     "@types/node": "^22.7.0",
-    "electron": "^32.2.0",
+    "electron": "https://github.com/castlabs/electron-releases/archive/refs/tags/v44.5.1%2Bwvcus.tar.gz",
+    "electron-builder": "^25.1.8",
     "esbuild": "^0.24.0",
     "typescript": "^5.6.0"
   },
   "dependencies": {
+    "@ghostery/adblocker-electron": "^2.20.1",
     "@iarna/toml": "^2.2.5",
+    "electron-chrome-context-menu": "1.1.0",
+    "electron-chrome-extensions": "^4.9.0",
+    "electron-chrome-web-store": "^0.13.0",
+    "electron-updater": "^6.8.9",
     "mockttp": "^3.17.2",
-    "undici": "^6.29.0"
+    "quickjs-emscripten": "^0.31.0",
+    "undici": "^6.29.0",
+    "webtorrent": "^3.0.21",
+    "yaml": "^2.6.1"
   },
-  "comment:future-deps": "Added in their ROADMAP phase (all install without a C compiler EXCEPT better-sqlite3, which needs node-gyp/MSVC — use the JSONL history fallback if unavailable): mockttp (proxy MITM), @iarna/toml (collections), @ghostery/adblocker-electron (adblock), better-sqlite3 (proxy history)."
+  "overrides": {
+    "webrtc-polyfill": "file:./stubs/webrtc-polyfill"
+  },
+  "comment:deps": "Browser deps come from Bro (castlabs Electron = Electron + Widevine, Ghostery adblock, Chrome extensions + Web Store, WebTorrent, electron-updater). Install with `npm install --install-links` so the webrtc-polyfill stub is copied, not linked. better-sqlite3 (proxy history) is still a future dep — it needs node-gyp/MSVC; JSONL history is the fallback. quickjs-emscripten = the API client's script sandbox (WebAssembly, no native build); yaml = OpenAPI YAML import."
 }

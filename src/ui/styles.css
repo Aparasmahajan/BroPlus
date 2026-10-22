@@ -26,6 +26,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); }
 
 button { font-family: inherit; }
@@ -56,11 +57,14 @@ body.chrome { background: var(--panel); display: flex; flex-direction: column; o
 }
 body.chrome.is-mac #tabstrip { padding-left: 78px; } /* clear macOS traffic lights */
 
-#tabs { display: flex; align-items: center; gap: 2px; max-width: calc(100% - 180px); overflow: hidden; -webkit-app-region: no-drag; }
+#tabs { display: flex; align-items: center; gap: 2px; flex: 0 1 auto; min-width: 0; overflow: hidden; -webkit-app-region: no-drag; }
 
 .tab {
+  /* Chrome-like: each tab wants a comfortable fixed width and only shrinks
+     (never stretches to fill) as more tabs open; the leftover strip stays
+     draggable. */
   display: flex; align-items: center; gap: 7px;
-  height: 28px; max-width: 200px; min-width: 56px;
+  flex: 0 1 220px; height: 28px; min-width: 40px;
   padding: 0 8px; border-radius: 8px 8px 0 0;
   background: transparent; cursor: default; overflow: hidden;
   -webkit-app-region: no-drag;
@@ -92,13 +96,65 @@ body.chrome.is-mac .win-controls { display: none; }
   display: flex; align-items: center; gap: 4px; padding: 0 8px;
   background: var(--bg); border-bottom: 1px solid var(--border);
 }
-#omnibox-wrap { flex: 1; }
+#omnibox-wrap { flex: 1; position: relative; display: flex; align-items: center; }
 #omnibox {
-  width: 100%; height: 34px; padding: 0 14px;
+  width: 100%; height: 34px; padding: 0 40px 0 14px;
   border: 1px solid var(--border); border-radius: 18px;
   background: var(--panel); color: var(--text); font-size: 13px; outline: none;
 }
 #omnibox:focus { border-color: var(--accent); background: var(--bg); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent); }
+.omnibox-btn {
+  position: absolute; right: 6px; width: 26px; height: 26px;
+  border: 0; border-radius: 50%; background: transparent; color: var(--muted);
+  font-size: 15px; cursor: pointer; line-height: 1;
+}
+.omnibox-btn:hover { background: rgba(127,127,127,0.16); }
+.omnibox-btn.on { color: #f5b301; }
+.omnibox-btn:disabled { opacity: 0.3; cursor: default; }
+#omnibox.zoomed { padding-right: 92px; }
+.omnibox-zoom {
+  position: absolute; right: 36px; height: 22px; padding: 0 8px;
+  border: 1px solid var(--border); border-radius: 11px; background: var(--bg);
+  color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; cursor: pointer;
+}
+.omnibox-zoom:hover { color: var(--text); border-color: var(--accent); }
+
+.tab.sleeping .tab-title { color: var(--muted); }
+
+/* Find bar (sits in the toolbar row while open) */
+.findbar {
+  display: flex; align-items: center; gap: 2px; flex: 0 0 auto;
+  padding: 2px 4px 2px 10px; border: 1px solid var(--accent); border-radius: 17px; background: var(--bg);
+}
+#find-input { width: 170px; height: 28px; border: 0; outline: none; background: transparent; color: var(--text); font-size: 13px; }
+.find-count { min-width: 56px; text-align: right; padding-right: 4px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.find-count.none { color: var(--danger); }
+.icon-btn.small { min-width: 26px; height: 26px; padding: 0 4px; font-size: 13px; }
+
+.shield {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 9px; border-radius: 999px; background: var(--panel);
+  font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer; user-select: none;
+  border: 1px solid transparent;
+}
+.shield:hover { border-color: var(--border); }
+.shield-icon { font-size: 13px; filter: grayscale(0.2); }
+.shield.off { opacity: 0.45; }
+.shield.off .shield-icon { filter: grayscale(1); }
+
+/* Extension toolbar (<browser-action-list>) */
+browser-action-list { display: flex; align-items: center; gap: 2px; }
+browser-action-list::part(action) {
+  width: 28px; height: 28px; margin: 0; padding: 0;
+  border: 0; border-radius: 8px; background-color: transparent;
+  background-repeat: no-repeat; background-position: center; background-size: 18px;
+  cursor: pointer;
+}
+browser-action-list::part(action):hover { background-color: rgba(127,127,127,0.16); }
+browser-action-list::part(badge) {
+  font-size: 8px; min-width: 8px; padding: 0 2px; border-radius: 4px;
+  position: relative; top: 8px; left: -6px;
+}
 
 /* ======================================================================== */
 /*  START PAGE — body.start                                                 */
@@ -118,33 +174,77 @@ body.start { background: var(--bg); display: flex; align-items: center; justify-
 .shortcut:hover { border-color: var(--accent); }
 .hint { color: var(--muted); font-size: 12px; }
 
-/* ======================================================================== */
-/*  SETTINGS PAGE — body.settings                                           */
-/* ======================================================================== */
-body.settings { background: color-mix(in srgb, var(--bg) 92%, transparent); display: flex; align-items: flex-start; justify-content: center; height: 100vh; overflow: auto; }
-.settings-sheet { width: 100%; max-width: 620px; margin: 28px 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px 28px; }
-.settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.settings-head h1 { margin: 0; font-size: 20px; }
-.group { padding: 14px 0; border-top: 1px solid var(--border); }
-.group:first-of-type { border-top: 0; }
-.group h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 0 0 10px; }
+/* ---- Private tabs ---- */
+:root { --private: #7c3aed; --private-bg: #ede9fe; }
+@media (prefers-color-scheme: dark) { :root { --private: #a78bfa; --private-bg: #2a2140; } }
+.private-btn { color: var(--private); min-width: 28px; height: 28px; padding: 0 6px; }
+.tab.private { box-shadow: inset 0 -2px 0 var(--private); }
+.tab.private.active { background: var(--private-bg); }
+.tab.private .tab-title::before { content: "Private · "; color: var(--private); font-weight: 600; }
+.private-badge {
+  flex: none; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  color: #fff; background: var(--private);
+}
+body.private-active #toolbar { background: var(--private-bg); }
+body.private-active #omnibox { border-color: color-mix(in srgb, var(--private) 45%, var(--border)); }
+body.private-active browser-action-list { display: none; }
+.private-note {
+  margin: 0 auto 22px; max-width: 460px; padding: 12px 16px; border-radius: 12px; text-align: left;
+  font-size: 13px; line-height: 1.55; color: var(--text); background: var(--private-bg);
+  border: 1px solid color-mix(in srgb, var(--private) 40%, transparent);
+}
+.private-note strong { color: var(--private); }
 
-.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 0; }
-.row-label strong { display: block; font-size: 14px; }
-.row-label small { color: var(--muted); font-size: 12px; }
+/* ---- Profiles + downloads (toolbar) ---- */
+.profile-btn {
+  flex: none; width: 26px; height: 26px; margin: 0 2px; border: 0; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.profile-btn:hover { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+.tab.profiled { box-shadow: inset 3px 0 0 var(--profile); }
 
-.pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.pill .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
-.pill[aria-checked="true"] { border-color: var(--on); color: var(--on); }
-.pill[aria-checked="true"] .dot { background: var(--on); box-shadow: 0 0 8px var(--on); }
 
-.opacity-ctl { display: flex; align-items: center; gap: 12px; }
-#opacity { width: 200px; accent-color: var(--accent); }
-.mono { font-variant-numeric: tabular-nums; font-size: 13px; width: 44px; text-align: right; color: var(--muted); }
+/* ---- Toolbar icons (inline SVG sprite, Lucide-style strokes) ---- */
+.sprite { display: none; }
+.ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+#toolbar .icon-btn { color: color-mix(in srgb, var(--text) 82%, transparent); }
+#toolbar .icon-btn:hover:not(:disabled) { color: var(--text); }
+#toolbar .icon-btn:active:not(:disabled) { background: rgba(127,127,127,0.24); }
+.omnibox-btn { display: inline-flex; align-items: center; justify-content: center; }
+.omnibox-btn .ico { width: 16px; height: 16px; }
+.omnibox-btn.on .ico { fill: currentColor; }
+.shield .shield-icon { width: 14px; height: 14px; color: var(--on); }
+.shield.off .shield-icon { color: var(--muted); }
 
-.note { font-size: 12px; color: var(--muted); line-height: 1.5; background: var(--bg); border: 1px dashed var(--border); border-radius: 10px; padding: 11px 13px; margin: 10px 0 0; }
-
-.hotkeys { margin: 0; padding: 0; list-style: none; font-size: 13px; line-height: 2.1; }
+/* Downloads + Save for offline: Chrome-style progress ring around the icon. */
+.dl-btn { position: relative; }
+.dl-btn.busy { color: var(--accent) !important; }
+.dl-ring {
+  position: absolute; inset: 0; margin: auto; width: 30px; height: 30px; pointer-events: none;
+  transform: rotate(-90deg); fill: none; stroke-width: 2.4;
+}
+.dl-ring .ring-track { stroke: color-mix(in srgb, var(--accent) 18%, transparent); }
+.dl-ring .ring-fill {
+  stroke: var(--accent); stroke-linecap: round;
+  stroke-dasharray: var(--p, 0) 100; transition: stroke-dasharray 0.4s ease;
+}
+.dl-ring.spin { animation: spin 1.1s linear infinite; }
+.dl-btn.busy .ico { transform: scale(0.82); transition: transform 0.2s; }
+.dl-badge {
+  position: absolute; top: 0; right: 0; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 8px;
+  background: var(--accent); color: #fff; font-size: 9.5px; line-height: 15px; font-weight: 700;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+body.private-active .dl-badge { box-shadow: 0 0 0 2px var(--private-bg); }
+.dl-btn.pulse { animation: dlpulse 1.2s ease-out 2; }
+@keyframes dlpulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+/* A video was found on the page: a small accent dot, not a different-looking button. */
+.offline-btn.has-video::after {
+  content: ''; position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 2px var(--bg);
+}
+.offline-btn.busy::after { display: none; }
+.offline-btn.idle { color: var(--muted) !important; }
 
 kbd { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; background: var(--bg); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
 

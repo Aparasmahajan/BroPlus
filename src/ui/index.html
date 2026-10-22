@@ -4,17 +4,30 @@
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' crx: data:"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bro</title>
+    <title>Bro Plus</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="chrome">
+    <svg class="sprite" aria-hidden="true">
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+      <symbol id="i-forward" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+      <symbol id="i-reload" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+      <symbol id="i-offline" viewBox="0 0 24 24"><path d="M12 13V7"/><path d="m15 10-3 3-3-3"/><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M12 17v4"/><path d="M8 21h8"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
+      <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.61 1.61a2.404 2.404 0 0 1-1.705.707 2.402 2.402 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.877l-1.568-1.568A2.402 2.402 0 0 1 1.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 1 0 3.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0 1 12 1.998c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02Z"/></symbol>
+      <symbol id="i-library" viewBox="0 0 24 24"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    </svg>
     <!-- Row 1: tab strip (draggable) -->
     <div id="tabstrip">
       <div id="tabs"></div>
       <button id="new-tab" class="icon-btn" title="New tab (Ctrl/Cmd+T)" aria-label="New tab">+</button>
+      <button id="new-private" class="icon-btn private-btn" title="New private tab (Ctrl/Cmd+Shift+N)" aria-label="New private tab"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 10h16l-1.6-5.2A1.2 1.2 0 0 0 17.2 4H6.8a1.2 1.2 0 0 0-1.2.8L4 10Zm-2 1.5h20v1.6H2v-1.6Zm4.5 3a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm11 0a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm-7 2.3h3v1.4h-3v-1.4Z"/></svg></button>
       <div class="drag-fill"></div>
       <div id="win-controls" class="win-controls">
         <button class="win-btn" id="btn-min" title="Minimize" aria-label="Minimize">&#x2013;</button>
@@ -25,10 +38,11 @@
 
     <!-- Row 2: toolbar -->
     <div id="toolbar">
-      <button class="icon-btn" id="btn-back" title="Back" aria-label="Back">&#x2190;</button>
-      <button class="icon-btn" id="btn-forward" title="Forward" aria-label="Forward">&#x2192;</button>
-      <button class="icon-btn" id="btn-reload" title="Reload (Ctrl/Cmd+R)" aria-label="Reload">&#x21bb;</button>
-      <div id="mode-switch" class="mode-switch"></div>
+      <button class="icon-btn" id="btn-back" title="Back" aria-label="Back"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg></button>
+      <button class="icon-btn" id="btn-forward" title="Forward" aria-label="Forward"><svg class="ico" aria-hidden="true"><use href="#i-forward"/></svg></button>
+      <button class="icon-btn" id="btn-reload" title="Reload (Ctrl/Cmd+R)" aria-label="Reload"><svg class="ico" aria-hidden="true"><use href="#i-reload"/></svg></button>
+      <div id="mode-switch" class="mode-switch" role="tablist" aria-label="Mode" hidden></div>
+      <span id="private-badge" class="private-badge" title="Private tab: no history, cookies wiped when the last private tab closes, extensions off" hidden>Private</span>
       <div id="omnibox-wrap">
         <input
           id="omnibox"
@@ -37,8 +51,26 @@
           autocomplete="off"
           placeholder="Search Google or type a URL"
         />
+        <button id="btn-zoom" class="omnibox-zoom" title="Reset zoom" aria-label="Reset zoom" hidden>100%</button>
+        <button id="btn-bookmark" class="omnibox-btn" title="Bookmark this page (Ctrl/Cmd+D)" aria-label="Bookmark"><svg class="ico" aria-hidden="true"><use href="#i-star"/></svg></button>
       </div>
-      <button class="icon-btn" id="btn-settings" title="Settings (Ctrl/Cmd+Shift+S)" aria-label="Settings">&#x2699;</button>
+      <div id="findbar" class="findbar" role="search" hidden>
+        <input id="find-input" type="text" spellcheck="false" autocomplete="off" placeholder="Find in page" aria-label="Find in page" />
+        <span id="find-count" class="find-count"></span>
+        <button class="icon-btn small" id="find-prev" title="Previous (Shift+Enter)" aria-label="Previous match">&#x2191;</button>
+        <button class="icon-btn small" id="find-next" title="Next (Enter)" aria-label="Next match">&#x2193;</button>
+        <button class="icon-btn small" id="find-close" title="Close (Esc)" aria-label="Close find bar">&#x2715;</button>
+      </div>
+      <span id="shield" class="shield" title="Trackers & ads blocked this session" hidden>
+        <svg class="ico shield-icon" aria-hidden="true"><use href="#i-shield"/></svg><span id="shield-count">0</span>
+      </span>
+      <button class="icon-btn dl-btn offline-btn" id="btn-offline" title="Save for offline: this page and its video (Ctrl/Cmd+S)" aria-label="Save for offline"><svg class="ico" aria-hidden="true"><use href="#i-offline"/></svg><svg class="dl-ring" id="off-ring" viewBox="0 0 36 36" aria-hidden="true" hidden><circle class="ring-track" cx="18" cy="18" r="15"/><circle class="ring-fill" cx="18" cy="18" r="15" pathLength="100"/></svg><span id="off-badge" class="dl-badge" hidden>0</span></button>
+      <button class="icon-btn dl-btn" id="btn-downloads" title="Downloads (Ctrl/Cmd+J)" aria-label="Downloads"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><svg class="dl-ring" id="dl-ring" viewBox="0 0 36 36" aria-hidden="true" hidden><circle class="ring-track" cx="18" cy="18" r="15"/><circle class="ring-fill" cx="18" cy="18" r="15" pathLength="100"/></svg><span id="dl-badge" class="dl-badge" hidden>0</span></button>
+      <browser-action-list id="actions"></browser-action-list>
+      <button class="icon-btn" id="btn-webstore" title="Get extensions (Chrome Web Store)" aria-label="Extensions"><svg class="ico" aria-hidden="true"><use href="#i-puzzle"/></svg></button>
+      <button class="icon-btn" id="btn-library" title="Bookmarks & History (Ctrl/Cmd+Y)" aria-label="Library"><svg class="ico" aria-hidden="true"><use href="#i-library"/></svg></button>
+      <button class="profile-btn" id="btn-profile" title="Profiles" aria-label="Profiles">P</button>
+      <button class="icon-btn" id="btn-settings" title="Settings (Ctrl/Cmd+Shift+S)" aria-label="Settings"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></button>
     </div>
 
     <script src="index.js"></script>

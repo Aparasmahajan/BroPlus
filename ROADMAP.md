@@ -8,7 +8,14 @@ Legend: ✅ done · 🟡 partial · ◻ to do.
 
 ## Status snapshot
 
+- **Browser parity with Bro** — ✅ done (2026-10-14): every Bro browser feature is in
+  core (tabs, private tabs, profiles, Library, downloads + torrents, Save for offline,
+  extensions, context menus, rebindable shortcuts, sessions, backup, Widevine via
+  castlabs Electron 44, auto-update wiring); adblock is now a real plugin. ◻ remaining:
+  route private/profile sessions through the Proxy too (today only the default
+  session is proxied), port Bro's e2e suites (tests/e2e) to BroPlus.
 - **Phase 0 Foundation** — ✅ done (browser + plugin host + build-time selection).
+- **Postman feature set** — ✅ done (2026-10-15): see PLUGINS.md → api-client. ◻ remaining: pm.sendRequest, CryptoJS/xml2Json in scripts, Digest/AWS/NTLM auth, OAuth 2 auth-code + PKCE (needs a browser hop), WebSocket/gRPC requests, mock servers, drag-and-drop reorder in the tree.
 - **Phase 1 API client** — ✅ done (builder, params/headers/auth/body, `{{vars}}`,
   environments, collections, response viewer + **diff**, history).
 - **Phase 2 Proxy captures HTTPS** — ✅ done (mockttp MITM, per-session CA trust,

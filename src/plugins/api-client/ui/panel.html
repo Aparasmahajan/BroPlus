@@ -4,89 +4,98 @@
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: blob:; frame-src 'self' blob: data:"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>API client</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="api-client.css" />
   </head>
-  <body class="panel api-root">
-    <!-- Sidebar: environments + save + collections / history tree -->
-    <aside class="api-side">
-      <div class="side-row">
-        <select id="env" class="grow" title="Active environment"></select>
-        <button id="env-new" class="mini-btn" title="New environment">+</button>
-        <button id="env-edit" class="mini-btn" title="Edit environment">✎</button>
+  <body class="ap">
+    <!-- Sidebar: collections / environments / history -->
+    <aside class="ap-side">
+      <div class="ap-side-head">
+        <button id="btn-new" class="btn primary sm" title="New request, collection or environment">+ New</button>
+        <button id="btn-import" class="btn sm" title="Import Postman, OpenAPI or cURL">Import</button>
+        <span class="grow"></span>
+        <button id="btn-runner" class="btn sm" title="Collection runner">Runner</button>
       </div>
-      <div class="side-row">
-        <input id="req-name" class="grow" placeholder="request name" spellcheck="false" />
-        <select id="save-col" title="Save into collection"></select>
-        <button id="req-save" class="mini-btn" title="Save request">Save</button>
+      <div class="ap-side-tabs" role="tablist">
+        <button data-side="collections" class="active">Collections</button>
+        <button data-side="environments">Environments</button>
+        <button data-side="history">History</button>
       </div>
-      <div class="side-row">
-        <button id="col-new" class="mini-btn grow">+ Collection</button>
-        <button id="view-collections" class="mini-btn active">Tree</button>
-        <button id="view-history" class="mini-btn">History</button>
-      </div>
-      <div id="tree" class="tree"></div>
+      <input id="side-filter" class="ap-filter" type="search" placeholder="Filter" spellcheck="false" />
+      <div id="side-list" class="ap-tree"></div>
     </aside>
 
-    <!-- Main request/response area -->
-    <main class="api-main">
-      <div class="api-bar">
-        <select id="method" class="method">
-          <option>GET</option><option>POST</option><option>PUT</option>
-          <option>PATCH</option><option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
-        </select>
-        <input id="url" class="url" type="text" spellcheck="false" autocomplete="off"
-               placeholder="https://api.example.com/path   —   {{baseUrl}}/path works" />
-        <button id="send" class="send">Send</button>
+    <!-- Main: open-request tabs, request editor, response -->
+    <main class="ap-main">
+      <div class="ap-topbar">
+        <div id="tabs" class="ap-tabs"></div>
+        <button id="btn-newtab" class="ap-newtab" title="New request (unsaved)">+</button>
+        <div class="ap-tools">
+          <select id="env" title="Active environment"></select>
+          <button id="btn-envlook" class="btn sm ghost" title="Variables in scope">Vars</button>
+          <button id="btn-cookies" class="btn sm ghost" title="Cookies (the browser's jar)">Cookies</button>
+          <button id="btn-vault" class="btn sm ghost" title="Secrets for ${vault:name}">Vault</button>
+        </div>
       </div>
 
-      <nav class="rtabs">
-        <button class="rtab active" data-rt="params">Params</button>
-        <button class="rtab" data-rt="headers">Headers</button>
-        <button class="rtab" data-rt="auth">Auth</button>
-        <button class="rtab" data-rt="body">Body</button>
-      </nav>
+      <div class="ap-reqhead">
+        <span id="crumbs" class="ap-crumbs"></span>
+        <input id="req-name" class="ap-name grow" spellcheck="false" aria-label="Request name" />
+        <button id="btn-code" class="btn sm" title="Code snippet">&lt;/&gt; Code</button>
+        <button id="btn-save" class="btn sm" title="Save (Ctrl+S)">Save</button>
+      </div>
 
-      <section class="rtab-body">
-        <div class="kv-wrap" data-rtp="params"></div>
-        <div class="kv-wrap" data-rtp="headers" hidden></div>
-        <div class="auth-wrap" data-rtp="auth" hidden>
-          <label class="mini">Authorization</label>
-          <select id="auth-kind">
-            <option value="none">No Auth</option>
-            <option value="bearer">Bearer Token</option>
-            <option value="basic">Basic Auth</option>
-          </select>
-          <div id="auth-fields"></div>
-        </div>
-        <div class="body-wrap" data-rtp="body" hidden>
-          <div class="body-modes">
-            <label><input type="radio" name="bm" value="none" /> None</label>
-            <label><input type="radio" name="bm" value="json" /> JSON</label>
-            <label><input type="radio" name="bm" value="text" /> Raw</label>
-            <label><input type="radio" name="bm" value="form" /> Form</label>
-          </div>
-          <textarea id="body" spellcheck="false" placeholder='{ "key": "{{value}}" }'></textarea>
-          <div class="kv-wrap" id="form-rows" hidden></div>
-        </div>
-      </section>
+      <div class="ap-urlbar">
+        <select id="method" class="ap-method mono" aria-label="Method">
+          <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option>
+          <option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+        </select>
+        <input id="url" class="ap-url" type="text" spellcheck="false" autocomplete="off"
+               placeholder="Enter URL, {{baseUrl}}/path — or paste a cURL command" />
+        <button id="btn-send" class="btn primary ap-send" title="Send (Ctrl+Enter)">Send</button>
+      </div>
 
-      <section class="res">
-        <div class="res-head">
-          <span id="status" class="status">—</span>
-          <span id="time" class="time"></span>
-          <span id="size" class="time"></span>
-          <span class="grow"></span>
-          <button id="t-body" class="seg active">Body</button>
-          <button id="t-headers" class="seg">Headers</button>
-          <button id="t-diff" class="seg">Diff</button>
-        </div>
-        <pre id="out" class="out"></pre>
-      </section>
+      <div class="ap-split" id="split">
+        <nav class="ap-rtabs" id="rtabs">
+          <button data-rt="params" class="active">Params</button>
+          <button data-rt="auth">Authorization</button>
+          <button data-rt="headers">Headers</button>
+          <button data-rt="body">Body</button>
+          <button data-rt="pre">Pre-request Script</button>
+          <button data-rt="test">Tests</button>
+          <button data-rt="settings">Settings</button>
+        </nav>
+        <section id="req-pane" class="ap-pane"></section>
+        <div id="divider" class="ap-divider" title="Drag to resize"></div>
+        <section class="ap-res" id="res">
+          <div class="ap-reshead" id="res-head"></div>
+          <nav class="ap-restabs" id="restabs">
+            <button data-res="body" class="active">Body</button>
+            <button data-res="headers">Headers</button>
+            <button data-res="cookies">Cookies</button>
+            <button data-res="tests">Test Results</button>
+            <button data-res="console">Console</button>
+            <button data-res="sent">Request sent</button>
+            <button data-res="diff">Diff</button>
+          </nav>
+          <div id="res-pane" class="ap-respane"></div>
+        </section>
+      </div>
     </main>
+
+    <div id="modal" class="ap-modal" hidden>
+      <div class="ap-dialog" role="dialog" aria-modal="true">
+        <header><h2 id="modal-title"></h2><button id="modal-x" class="btn ghost icon" aria-label="Close">&#x2715;</button></header>
+        <div id="modal-body" class="body"></div>
+        <div id="modal-foot" class="foot"></div>
+      </div>
+    </div>
+    <div id="menu" class="ap-menu" hidden></div>
+    <div id="toast" class="ap-toast" hidden></div>
 
     <script src="api-client.js"></script>
   </body>

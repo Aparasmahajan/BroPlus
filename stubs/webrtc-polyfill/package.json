@@ -1,0 +1,8 @@
+{
+  "name": "webrtc-polyfill",
+  "version": "1.2.2",
+  "description": "Bro stub: no WebRTC in the main process. WebTorrent then uses TCP/uTP peers, DHT and trackers only (the real package needs the native node-datachannel).",
+  "main": "index.js",
+  "exports": { "import": "./index.mjs", "require": "./index.js" },
+  "license": "MIT"
+}

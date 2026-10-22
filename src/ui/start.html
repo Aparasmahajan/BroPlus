@@ -10,13 +10,19 @@
     <main class="start-wrap">
       <div class="logo">Bro</div>
       <p class="tagline">Private browsing. Hidden from screen share.</p>
+      <div id="private-note" class="private-note" hidden>
+        <strong>You're in a private tab.</strong> Pages you visit here aren't saved to history or
+        restored next time, extensions are off, and cookies and site data are deleted when you
+        close your last private tab. Ads are still blocked. Sites, your employer or your network
+        can still see what you visit.
+      </div>
 
       <form id="search-form" class="start-search" autocomplete="off">
         <input
           id="q"
           type="text"
           spellcheck="false"
-          placeholder="Search Google or type a URL"
+          placeholder="Search or type a URL — try “yt lofi”"
           autofocus
         />
       </form>
@@ -25,7 +31,6 @@
         <a class="shortcut" href="https://www.google.com">Google</a>
         <a class="shortcut" href="https://www.youtube.com">YouTube</a>
         <a class="shortcut" href="https://github.com">GitHub</a>
-        <a class="shortcut" href="https://en.wikipedia.org">Wikipedia</a>
       </div>
 
       <p class="hint">
@@ -35,25 +40,18 @@
     </main>
 
     <script>
-      // Self-navigating: no privileged bridge on web content. We just set
-      // location, and the main process picks up did-navigate to update the bar.
+      // No privileged bridge on web content. We navigate to start.html?q=…;
+      // the main process intercepts that (tabs.ts, will-navigate) and resolves
+      // it with the user's search engines + keywords, same as the omnibox.
       (function () {
         var mac = navigator.platform.toLowerCase().indexOf('mac') === 0;
         if (mac) { document.getElementById('k').textContent = 'Cmd'; document.getElementById('k2').textContent = 'Cmd'; }
-
-        function resolve(raw) {
-          var input = (raw || '').trim();
-          if (!input) return null;
-          if (/^(https?|file|about):/i.test(input)) return input;
-          var looksLikeUrl = /^[^\s]+\.[^\s]+$/.test(input) || /^localhost(:\d+)?/.test(input);
-          if (looksLikeUrl) return 'https://' + input;
-          return 'https://www.google.com/search?q=' + encodeURIComponent(input);
-        }
+        if (/[?&]private=1/.test(window.location.search)) document.getElementById('private-note').hidden = false;
 
         document.getElementById('search-form').addEventListener('submit', function (e) {
           e.preventDefault();
-          var url = resolve(document.getElementById('q').value);
-          if (url) window.location.href = url;
+          var q = document.getElementById('q').value.trim();
+          if (q) window.location.href = window.location.pathname + '?q=' + encodeURIComponent(q);
         });
       })();
     </script>

@@ -7,8 +7,11 @@
 // Channels (via the generic bus):
 //   overlay:get     invoke → boolean (currently hidden?)
 //   overlay:set     send(boolean)
-//   overlay:changed event → boolean   (so the Settings section stays in sync)
-// Hotkey: Ctrl/Cmd+Shift+H toggles.
+//   overlay:changed event → boolean  (emitted by the window on every change, so
+//                   the Settings section stays in sync with the hotkey too)
+// Hotkey: the rebindable `stealth.toggleCapture` command (default
+// Ctrl/Cmd+Shift+H, Settings → Keyboard shortcuts) — it exists only in builds
+// that include this plugin (see shared/shortcuts.ts).
 import type { BroPlugin, MainContext } from '../../core/plugin';
 
 const plugin: BroPlugin = {
@@ -20,17 +23,12 @@ const plugin: BroPlugin = {
   },
 
   registerMain(ctx: MainContext): void {
-    // Default ON when this plugin ships — the whole point of Bro_plus.
-    ctx.setCaptureHidden(true);
-
-    const apply = (hidden: boolean) => {
-      ctx.setCaptureHidden(hidden);
-      ctx.sendToUi('overlay:changed', hidden);
-    };
+    // Default ON when this plugin ships — the whole point of Bro_plus. Applied
+    // before the window is first shown, so not one frame is capturable.
+    ctx.onWindow(() => ctx.setCaptureHidden(true));
 
     ctx.ipc.handle('overlay:get', () => ctx.getCaptureHidden());
-    ctx.ipc.on('overlay:set', (_e, hidden: boolean) => apply(hidden));
-    ctx.registerHotkey('CommandOrControl+Shift+H', () => apply(!ctx.getCaptureHidden()));
+    ctx.ipc.on('overlay:set', (_e, hidden: boolean) => ctx.setCaptureHidden(!!hidden));
   },
 };
 

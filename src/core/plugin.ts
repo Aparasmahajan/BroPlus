@@ -44,20 +44,57 @@ export interface PluginInfo {
   surface?: SurfaceSpec;
 }
 
+/** Which browsing session a hook is being told about (see MainContext.onSession). */
+export interface SessionInfo {
+  /** The shared in-memory session private tabs use. */
+  private: boolean;
+  /** Profile the session belongs to ('default' for the original one and for private tabs). */
+  profileId: string;
+  /** Electron partition ('' = the default session). */
+  partition: string;
+}
+
 /** Everything a plugin's main-process code is handed at registration. */
 export interface MainContext {
   app: App;
   /** The one native window (frameless, content-protectable, opacity-capable). */
   win: BrowserWindow;
   ipc: IpcMain;
-  /** The shared Electron session (cookies seen by tabs + API + proxy). */
+  /** The shared Electron session (default profile: cookies seen by tabs + API + proxy). */
   session: Session;
+  /**
+   * Run for EVERY session browser tabs use — the default one, each profile's and
+   * the private one — now for those already in use and later for each new one
+   * (e.g. ad blocking has to cover all of them).
+   */
+  onSession(hook: (s: Session, info: SessionInfo) => void): void;
+  /** Run for the main window now, and for any window re-created later (macOS dock re-open). */
+  onWindow(hook: (win: BrowserWindow) => void): void;
+  /** Run once the window is up and the first tabs exist — for slow, deferrable work. */
+  onStarted(hook: () => void): void;
   /** Portable config root (BRO_PLUS_CONFIG_DIR override, else userData). */
   configDir: string;
 
+  /** Open a URL in a new browser tab (and show the Browse surface). */
+  openTab(url: string): void;
+
+  /**
+   * Tiny service registry so plugins can cooperate without importing each
+   * other: e.g. the proxy provides 'proxy' ({ running, port, caPem }) and the API
+   * client looks it up to "send through the proxy". lookup() returns undefined
+   * when the providing plugin is not in this build.
+   */
+  provide<T>(name: string, service: T): void;
+  lookup<T>(name: string): T | undefined;
+
   /** Send an event to every trusted UI view (chrome, settings, all panels). */
   sendToUi(channel: string, payload?: unknown): void;
-  /** Register a global hotkey; auto-unregistered on quit. Returns success. */
+  /**
+   * Register a fixed system-wide hotkey (kept across shortcut re-binds, released
+   * on quit). Returns false if the OS refused it. For a key users should be able
+   * to rebind, add a command tagged with this plugin's id to the registry in
+   * shared/shortcuts.ts instead.
+   */
   registerHotkey(accel: string, handler: () => void): boolean;
 
   // --- Core window capabilities plugins drive (overlay/opacity use these) ---

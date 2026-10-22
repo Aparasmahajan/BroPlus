@@ -8,10 +8,13 @@
 //      so excluded plugins are never referenced and get tree-shaken out.
 //   4. Build a UI entry + copy the panel HTML for every enabled plugin that has
 //      one (src/plugins/<id>/ui/panel.ts → dist/ui/<id>.js, panel.html → <id>.html).
+//   5. Build a session preload for every enabled plugin that has one
+//      (src/plugins/<id>/preload.ts → dist/preload/<id>.js), e.g. adblock's
+//      YouTube shield.
 //
 // Targets:
 //   main    → dist/main/index.js       (Node; electron + native deps external)
-//   preload → dist/preload/bridge.js   (Node)
+//   preload → dist/preload/{bridge,chrome,<plugin>}.js (Node)
 //   ui      → dist/ui/*.js             (browser) + copied html/css
 import { build, context } from 'esbuild';
 import { cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
@@ -63,6 +66,14 @@ async function planPlugins() {
     }
   }
 
+  // Which enabled plugins ship a session preload.
+  const preloadEntries = {};
+  for (const id of enabled) {
+    if (existsSync(join('src/plugins', id, 'preload.ts'))) {
+      preloadEntries[id] = `src/plugins/${id}/preload.ts`;
+    }
+  }
+
   // Codegen the active-plugins registry the main process imports.
   const imports = enabled.map((id, i) => `import p${i} from '../plugins/${id}/main';`).join('\n');
   const arr = enabled.map((_, i) => `p${i}`).join(', ');
@@ -76,10 +87,10 @@ async function planPlugins() {
   await writeFile('src/generated/active-plugins.ts', gen);
 
   console.log(`[plugins] enabled: ${enabled.join(', ') || '(none)'}`);
-  return { enabled, uiEntries };
+  return { enabled, uiEntries, preloadEntries };
 }
 
-const { uiEntries } = await planPlugins();
+const { uiEntries, preloadEntries } = await planPlugins();
 
 // ---------- esbuild targets ----------
 
@@ -101,20 +112,40 @@ const targets = [
     format: 'cjs',
     target: 'node20',
     // electron + native/Node-centric deps resolved at runtime from node_modules.
-    external: ['electron', 'undici', 'mockttp', 'better-sqlite3', '@iarna/toml'],
+    // The extension/adblock packages resolve their own preload paths via
+    // require.resolve() / createRequire() at load time, which only works when
+    // required from node_modules — so they stay external (never bundled).
+    external: [
+      'electron',
+      'undici',
+      'mockttp',
+      'better-sqlite3',
+      '@iarna/toml',
+      'electron-updater',
+      '@ghostery/*',
+      'electron-chrome-extensions',
+      'electron-chrome-extensions/*',
+      'electron-chrome-web-store',
+      'electron-chrome-web-store/*',
+      'electron-chrome-context-menu',
+      // ESM-only with optional native add-ons; loaded with import() on the first torrent.
+      'webtorrent',
+      // Loads its .wasm next to its own files at runtime (the API client's script sandbox).
+      'quickjs-emscripten',
+    ],
   },
   {
     ...common,
-    entryPoints: { bridge: 'src/preload/bridge.ts' },
+    entryPoints: { bridge: 'src/preload/bridge.ts', chrome: 'src/preload/chrome.ts', ...preloadEntries },
     outdir: 'dist/preload',
     platform: 'node',
     format: 'cjs',
     target: 'node20',
-    external: ['electron'],
+    external: ['electron', 'electron-chrome-extensions', 'electron-chrome-extensions/*'],
   },
   {
     ...common,
-    entryPoints: { index: 'src/ui/index.ts', settings: 'src/ui/settings.ts', ...uiEntries },
+    entryPoints: { index: 'src/ui/index.ts', settings: 'src/ui/settings.ts', library: 'src/ui/library.ts', ...uiEntries },
     outdir: 'dist/ui',
     platform: 'browser',
     format: 'iife',
@@ -130,13 +161,15 @@ async function copyStatic() {
       await cp(`src/ui/${name}`, `dist/ui/${name}`);
     }
   }
-  // Each enabled plugin's panel.html → dist/ui/<id>.html (matches SurfaceSpec.html).
+  // Each enabled plugin's panel.html → dist/ui/<id>.html (matches SurfaceSpec.html),
+  // and its optional panel.css → dist/ui/<id>.css.
   for (const id of Object.keys(uiEntries)) {
-    const html = `src/plugins/${id}/ui/panel.html`;
-    if (existsSync(html)) {
-      const dest = `dist/ui/${id}.html`;
+    for (const ext of ['html', 'css']) {
+      const src = `src/plugins/${id}/ui/panel.${ext}`;
+      if (!existsSync(src)) continue;
+      const dest = `dist/ui/${id}.${ext}`;
       await mkdir(dirname(dest), { recursive: true });
-      await cp(html, dest);
+      await cp(src, dest);
     }
   }
 }
